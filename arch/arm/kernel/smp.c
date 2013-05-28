@@ -511,7 +511,11 @@ static void ipi_cpu_stop(unsigned int cpu)
 {
 	if (system_state == SYSTEM_BOOTING ||
 	    system_state == SYSTEM_RUNNING) {
-		raw_spin_lock(&stop_lock);
+		for (;;) {
+			if (raw_spin_trylock(&stop_lock))
+				break;
+			__delay(1);
+		}
 		printk(KERN_CRIT "CPU%u: stopping\n", cpu);
 		dump_stack();
 		raw_spin_unlock(&stop_lock);
