@@ -24,7 +24,6 @@
 #include <asm/hw_breakpoint.h>
 #include <asm/ptrace.h>
 #include <asm/types.h>
-#include <asm/system.h>
 #include <asm/unified.h>
 
 #ifdef __KERNEL__
