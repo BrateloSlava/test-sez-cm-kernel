@@ -177,17 +177,13 @@ config ARCH_MSM8960
 	select MSM_KRAIT_WFE_FIXUP
 	select MSM_IOMMU_GPU_SYNC
 	select MSM_CPU_PWRCTL
-<<<<<<< HEAD
 	select HAVE_NMI_WATCHDOG if MSM_WATCHDOG || MSM_WATCHDOG_V2
 	select GENERIC_TIME_VSYSCALL
 	select USE_USER_ACCESSIBLE_TIMERS
 	select ARM_USE_USER_ACCESSIBLE_TIMERS
 	select MSM_USE_USER_ACCESSIBLE_TIMERS
-        select HAS_MACH_MEMUTILS
-=======
 	select HAS_MACH_MEMUTILS
 	select MSM_ULTRASOUND_A
->>>>>>> 4791c46... msm: ultrasound: add support for various msm families
 
 config ARCH_MSM8930
 	bool "MSM8930"
@@ -255,15 +251,12 @@ config ARCH_APQ8064
 	select MSM_KRAIT_WFE_FIXUP
 	select MSM_IOMMU_GPU_SYNC
 	select MSM_CPU_PWRCTL
-<<<<<<< HEAD
 	select HAVE_NMI_WATCHDOG if MSM_WATCHDOG || MSM_WATCHDOG_V2
 	select GENERIC_TIME_VSYSCALL
 	select USE_USER_ACCESSIBLE_TIMERS
 	select ARM_USE_USER_ACCESSIBLE_TIMERS
 	select MSM_USE_USER_ACCESSIBLE_TIMERS
-=======
 	select MSM_ULTRASOUND_A
->>>>>>> 4791c46... msm: ultrasound: add support for various msm families
 
 config ARCH_MSM8974
 	bool "MSM8974"
