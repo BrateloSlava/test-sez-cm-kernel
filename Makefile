@@ -357,6 +357,10 @@ CUSTOM_FLAG	= -fgcse-lm -fgcse-sm -fsched-spec-load -fgcse-after-reload \
 		  -munaligned-access -fpredictive-commoning -fivopts \
 		  -fira-loop-pressure
 
+CFLAGS_MODULE   = -DMODULE -fno-pic $(CUSTOM_FLAG) -O2
+AFLAGS_MODULE   = -DMODULE $(CUSTOM_FLAG) -O2
+LDFLAGS_MODULE  = 
+
 ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
 CUSTOM_FLAG	+= -Os
 endif
@@ -370,9 +374,6 @@ ifdef CONFIG_CC_OPTIMIZE_FAST
 CUSTOM_FLAG	+= -Ofast
 endif
 
-CFLAGS_MODULE   = -DMODULE -fno-pic $(CUSTOM_FLAG)
-AFLAGS_MODULE   = -DMODULE $(CUSTOM_FLAG)
-LDFLAGS_MODULE  = 
 CFLAGS_KERNEL	= $(CUSTOM_FLAG)
 AFLAGS_KERNEL	= $(CUSTOM_FLAG)
 CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
