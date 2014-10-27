@@ -33,13 +33,13 @@ ifeq ($(CONFIG_MMU),)
 MMUEXT		:= -nommu
 endif
 
-ifeq ($(CONFIG_FRAME_POINTER),y)
-KBUILD_CFLAGS	+=-fno-omit-frame-pointer -mapcs -mno-sched-prolog
-endif
-
 ifeq ($(CONFIG_CC_STACKPROTECTOR),y)
 KBUILD_CFLAGS	+=-fstack-protector
 endif
+
+# ARM gcc developers unfortunately broke -fconserve-stack. It misaligns
+# variables on the stack
+KBUILD_CFLAGS += $(call cc-option,-fno-conserve-stack)
 
 ifeq ($(CONFIG_CPU_BIG_ENDIAN),y)
 KBUILD_CPPFLAGS	+= -mbig-endian
@@ -64,7 +64,7 @@ CUSTOM_FLAG	= -fgcse-lm -fgcse-sm -fsched-spec-load -fgcse-after-reload \
 		  -mvectorize-with-neon-quad -marm -pipe \
 		  -fgraphite -floop-interchange -ftree-loop-distribution -floop-strip-mine -floop-block \
 		  -munaligned-access -fpredictive-commoning -fivopts \
-		  -fira-loop-pressure
+		  -fira-loop-pressure -funsafe-math-optimizations
 
 ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
 CUSTOM_FLAG	+= -Os

@@ -3025,7 +3025,7 @@ SYSCALL_DEFINE5(linkat, int, olddfd, const char __user *, oldname,
 		int, newdfd, const char __user *, newname, int, flags)
 {
 	struct dentry *new_dentry;
-	struct path old_path, new_path;
+	struct path uninitialized_var(old_path), uninitialized_var(new_path);
 	int how = 0;
 	int error;
 
