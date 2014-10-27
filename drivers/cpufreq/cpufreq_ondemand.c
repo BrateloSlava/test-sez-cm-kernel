@@ -63,7 +63,7 @@ static unsigned int min_sampling_rate;
 #define POWERSAVE_BIAS_MAXLEVEL			(1000)
 #define POWERSAVE_BIAS_MINLEVEL			(-1000)
 
-static void do_dbs_timer(struct work_struct *work);
+static void ondemand_do_dbs_timer(struct work_struct *work);
 static int cpufreq_governor_dbs(struct cpufreq_policy *policy,
 				unsigned int event);
 
@@ -98,15 +98,15 @@ struct cpu_dbs_info_s {
 	unsigned int sample_type:1;
 	/*
 	 * percpu mutex that serializes governor limit change with
-	 * do_dbs_timer invocation. We do not want do_dbs_timer to run
+	 * ondemand_do_dbs_timer invocation. We do not want ondemand_do_dbs_timer to run
 	 * when user is changing the governor or limits.
 	 */
 	struct mutex timer_mutex;
 };
 static DEFINE_PER_CPU(struct cpu_dbs_info_s, od_cpu_dbs_info);
 
-static inline void dbs_timer_init(struct cpu_dbs_info_s *dbs_info);
-static inline void dbs_timer_exit(struct cpu_dbs_info_s *dbs_info);
+static inline void ondemand_dbs_timer_init(struct cpu_dbs_info_s *dbs_info);
+static inline void ondemand_dbs_timer_exit(struct cpu_dbs_info_s *dbs_info);
 
 static unsigned int dbs_enable;	/* number of CPUs using this policy */
 
@@ -563,7 +563,7 @@ static ssize_t store_powersave_bias(struct kobject *a, struct attribute *b,
 				cpumask_set_cpu(cpu, &cpus_timer_done);
 				if (dbs_info->cur_policy) {
 					/* restart dbs timer */
-					dbs_timer_init(dbs_info);
+					ondemand_dbs_timer_init(dbs_info);
 				}
 skip_this_cpu:
 				unlock_policy_rwsem_write(cpu);
@@ -593,7 +593,7 @@ skip_this_cpu:
 
 			if (dbs_info->cur_policy) {
 				/* cpu using ondemand, cancel dbs timer */
-				dbs_timer_exit(dbs_info);
+				ondemand_dbs_timer_exit(dbs_info);
 
 				mutex_lock(&dbs_info->timer_mutex);
 				ondemand_powersave_bias_setspeed(
@@ -868,7 +868,7 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 	}
 }
 
-static void do_dbs_timer(struct work_struct *work)
+static void ondemand_do_dbs_timer(struct work_struct *work)
 {
 	struct cpu_dbs_info_s *dbs_info =
 		container_of(work, struct cpu_dbs_info_s, work.work);
@@ -907,7 +907,7 @@ static void do_dbs_timer(struct work_struct *work)
 	mutex_unlock(&dbs_info->timer_mutex);
 }
 
-static inline void dbs_timer_init(struct cpu_dbs_info_s *dbs_info)
+static inline void ondemand_dbs_timer_init(struct cpu_dbs_info_s *dbs_info)
 {
 	/* We want all CPUs to do sampling nearly on same jiffy */
 	int delay = usecs_to_jiffies(dbs_tuners_ins.sampling_rate);
@@ -916,11 +916,11 @@ static inline void dbs_timer_init(struct cpu_dbs_info_s *dbs_info)
 		delay -= jiffies % delay;
 
 	dbs_info->sample_type = DBS_NORMAL_SAMPLE;
-	INIT_DELAYED_WORK_DEFERRABLE(&dbs_info->work, do_dbs_timer);
+	INIT_DELAYED_WORK_DEFERRABLE(&dbs_info->work, ondemand_do_dbs_timer);
 	schedule_delayed_work_on(dbs_info->cpu, &dbs_info->work, delay);
 }
 
-static inline void dbs_timer_exit(struct cpu_dbs_info_s *dbs_info)
+static inline void ondemand_dbs_timer_exit(struct cpu_dbs_info_s *dbs_info)
 {
 	cancel_delayed_work_sync(&dbs_info->work);
 }
@@ -1126,11 +1126,11 @@ static int cpufreq_governor_dbs(struct cpufreq_policy *policy,
 					this_dbs_info->cur_policy,
 					NULL,
 					dbs_tuners_ins.powersave_bias))
-			dbs_timer_init(this_dbs_info);
+			ondemand_dbs_timer_init(this_dbs_info);
 		break;
 
 	case CPUFREQ_GOV_STOP:
-		dbs_timer_exit(this_dbs_info);
+		ondemand_dbs_timer_exit(this_dbs_info);
 
 		mutex_lock(&dbs_mutex);
 		dbs_enable--;
