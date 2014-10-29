@@ -59,7 +59,7 @@ fi;
 ## 2 - Disabled    
 
 if [ -e /sys/module/logger/parameters/log_mode ]; then
-	echo "0" > /sys/module/logger/parameters/log_mode
+	echo "2" > /sys/module/logger/parameters/log_mode
 fi;
 
 ### Printk logging control
