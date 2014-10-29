@@ -1,0 +1,204 @@
+#!/system/bin/sh
+
+##
+#
+#  /etc/init.d script
+#  For Sony Xperia Z (cm11 yuga nightly build)
+#  Copyright (C) 2013,2014 BrateloSlava, 4pda.ru + XDA
+#
+##
+
+IO_SCH="bfq"
+READ_AHEAD_KB="4096"
+
+# wait for android os
+until [ `pidof com.android.systemui` ]; do
+sleep 1
+done;
+
+sleep 30
+
+## Set min CPU_FREQ
+echo 162000 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq;
+chmod 444 /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
+echo 162000 > /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq;
+chmod 444 /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq
+echo 162000 > /sys/devices/system/cpu/cpu2/cpufreq/scaling_min_freq;
+chmod 444 /sys/devices/system/cpu/cpu2/cpufreq/scaling_min_freq
+echo 162000 > /sys/devices/system/cpu/cpu3/cpufreq/scaling_min_freq;
+chmod 444 /sys/devices/system/cpu/cpu3/cpufreq/scaling_min_freq
+
+## Set max CPU_FREQ
+echo 1512000 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq;
+chmod 444 /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+echo 1512000 > /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq;
+chmod 444 /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq
+echo 1512000 > /sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq;
+chmod 444 /sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq
+echo 1512000 > /sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq;
+chmod 444 /sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq
+
+### Dynamic fsync
+if [ -e /sys/kernel/dyn_fsync/ ]; then
+	echo 1 > /sys/kernel/dyn_fsync/Dyn_fsync_active
+fi;
+
+### Enable fastcharge
+if [ -e /sys/kernel/fast_charge/ ]; then
+	echo "1" > /sys/kernel/fast_charge/force_fast_charge
+fi;
+
+### Multi-Core Power Saving
+if [ -e /sys/devices/system/cpu/sched_mc_power_savings ]; then
+	echo "0" > /sys/devices/system/cpu/sched_mc_power_savings
+fi;
+
+### Logger mode
+## 0 - Enabled     
+## 1 - Auto Suspend
+## 2 - Disabled    
+
+if [ -e /sys/module/logger/parameters/log_mode ]; then
+	echo "0" > /sys/module/logger/parameters/log_mode
+fi;
+
+### Printk logging control
+## 0 - Disable
+## 1 - Enable
+
+if [ -e /sys/kernel/printk_mode/ ]; then
+	echo "0" > /sys/kernel/printk_mode/printk_mode
+fi;
+
+# vibration level (default 32)
+chmod 644 /sys/class/timed_output/vibrator/level
+echo 27 > /sys/class/timed_output/vibrator/level;
+chmod 444 /sys/class/timed_output/vibrator/level
+
+### Setting and Tweaking I/O Scheduler
+MMC=`ls -d /sys/block/mmcblk*`
+for i in $MMC; do
+	echo $IO_SCH > $i/queue/scheduler
+done
+sleep 3
+
+MMC=`ls -d /sys/block/mmcblk*`
+for i in $MMC; do
+	echo $READ_AHEAD_KB > $i/bdi/read_ahead_kb
+done
+sleep 3
+
+### SDcard read ahead
+VD=`ls -d /sys/devices/virtual/bdi/*`
+for i in $VD; do
+	echo $READ_AHEAD_KB > $i/read_ahead_kb;
+done
+sleep 3
+
+### Change the TCP Congestion Algorithm
+sysctl -w net.ipv4.tcp_congestion_control=westwood
+
+## Intelli plug setting
+if [ -e /sys/module/intelli_plug/ ]; then
+	echo 702000 > /sys/module/intelli_plug/parameters/screen_off_max;
+	echo 0 > /sys/module/intelli_plug/parameters/touch_boost_active;
+	#echo 2 > /sys/module/intelli_plug/parameters/nr_run_profile_sel;
+fi;
+
+## GPU governor (default ondemand)
+#echo 'powersave' > /sys/devices/platform/kgsl-3d0.0/kgsl/kgsl-3d0/pwrscale/trustzone/governor;
+#echo 'simple' > /sys/devices/platform/kgsl-3d0.0/kgsl/kgsl-3d0/pwrscale/trustzone/governor;
+#echo 'conservative' > /sys/devices/platform/kgsl-3d0.0/kgsl/kgsl-3d0/pwrscale/trustzone/governor;
+
+## Undervolt GPU
+echo "930000 1000000 1100000" > /sys/devices/system/cpu/cpu0/cpufreq/gpu_mv_table;
+
+## User Voltage Settings
+## Undervolt -0
+#  echo "81000 800000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+#  echo "162000 850000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+#  echo "270000 875000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+#  echo "384000 900000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+#  echo "486000 925000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+#  echo "594000 950000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+#  echo "702000 975000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+#  echo "810000 1025000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+#  echo "918000 1050000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+#  echo "1026000 1075000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+#  echo "1134000 1125000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+#  echo "1242000 1150000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+#  echo "1350000 1175000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+#  echo "1458000 1187500" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+#  echo "1512000 1200000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+#  echo "1620000 1250000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+#  echo "1728000 1300000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+#  echo "1836000 1350000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+
+## Undervolt my
+echo "81000 700000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+echo "162000 750000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+echo "270000 775000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+echo "384000 800000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+echo "486000 825000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+echo "594000 850000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+echo "702000 875000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+echo "810000 925000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+echo "918000 950000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+echo "1026000 975000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+echo "1134000 1025000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+echo "1242000 1050000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+echo "1350000 1075000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+echo "1458000 1087500" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+echo "1512000 1100000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+echo "1620000 1150000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+echo "1728000 1200000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+echo "1836000 1250000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+
+## Undervolt my_new
+#  echo "81000 637500" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+#  echo "162000 675000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+#  echo "270000 700000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+#  echo "384000 725000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+#  echo "486000 750000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+#  echo "594000 775000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+#  echo "702000 800000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+#  echo "810000 825000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+#  echo "918000 850000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+#  echo "1026000 875000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+#  echo "1134000 900000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+#  echo "1242000 925000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+#  echo "1350000 950000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+#  echo "1458000 1000000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+#  echo "1512000 1025000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+#  echo "1620000 1050000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+#  echo "1728000 1100000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+#  echo "1836000 1225000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels
+
+## Cpu governor
+chmod 644 /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+echo "smartmax" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor;
+chmod 444 /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+sleep 3
+
+## Intelli thermal settings
+#echo "Y" > /sys/module/msm_thermal/parameters/enabled;
+#echo 75 > /sys/module/msm_thermal/parameters/core_limit_temp_degC;
+#echo 70 > /sys/module/msm_thermal/parameters/limit_temp_degC;
+
+## Some tweaks
+setprop net.ppp0.dns1 8.8.8.8;
+setprop net.ppp0.dns2 8.8.4.4;
+setprop net.dns1 8.8.8.8;
+setprop net.dns2 8.8.4.4;
+setprop ro.ril.enable.a53 1;
+setprop ro.ril.enable.a52 0;
+setprop ro.ril.enable.dtm 1;
+setprop ro.com.google.locationfeatures 0;
+setprop ro.com.google.networklocation 0;
+setprop profiler.force_disable_err_rpt 1;
+setprop profiler.force_disable_ulog 1;
+setprop logcat.live disable;
+setprop ro.lge.proximity.delay 25;
+setprop mot.proximity.delay 25;
+setprop ro.telephony.call_ring.delay 0;
+setprop wifi.supplicant_scan_interval 180
