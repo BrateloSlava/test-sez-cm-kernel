@@ -185,6 +185,12 @@ sleep 3
 #echo 75 > /sys/module/msm_thermal/parameters/core_limit_temp_degC;
 #echo 70 > /sys/module/msm_thermal/parameters/limit_temp_degC;
 
+### Reduce backlight brightness
+## for revert to default - enter 0
+if [ -e /sys/module/msm_fb/parameters/backlight_dimmer ]; then
+	echo "7" > /sys/module/msm_fb/parameters/backlight_dimmer
+fi;
+
 ## Some tweaks
 setprop net.ppp0.dns1 8.8.8.8;
 setprop net.ppp0.dns2 8.8.4.4;
