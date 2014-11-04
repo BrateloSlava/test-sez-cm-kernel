@@ -10,33 +10,6 @@
 extern int msm_krait_need_wfe_fixup;
 
 /*
- * sev and wfe are ARMv6K extensions.  Uniprocessor ARMv6 may not have the K
- * extensions, so when running on UP, we have to patch these instructions away.
- */
-#define ALT_SMP(smp, up)					\
-	"9998:	" smp "\n"					\
-	"	.pushsection \".alt.smp.init\", \"a\"\n"	\
-	"	.long	9998b\n"				\
-	"	" up "\n"					\
-	"	.popsection\n"
-
-#ifdef CONFIG_THUMB2_KERNEL
-#define SEV		ALT_SMP("sev.w", "nop.w")
-/*
- * Both instructions given to the ALT_SMP macro need to be the same size, to
- * allow the SMP_ON_UP fixups to function correctly. Hence the explicit encoding
- * specifications.
- */
-#define WFE()		ALT_SMP(		\
-	"wfe.w",				\
-	"nop.w"					\
-)
-#else
-#define SEV		ALT_SMP("sev", "nop")
-#define WFE()		ALT_SMP("wfe", "nop")
-#endif
-
-/*
  * The fixup involves disabling FIQs during execution of the WFE instruction.
  * This could potentially lead to deadlock if a thread is trying to acquire a
  * spinlock which is being released from an FIQ. This should not be a problem
@@ -62,6 +35,34 @@ extern int msm_krait_need_wfe_fixup;
 #else
 #define WFE_SAFE(fixup, tmp)	"	wfe\n"
 #endif
+
+/*
+ * sev and wfe are ARMv6K extensions.  Uniprocessor ARMv6 may not have the K
+ * extensions, so when running on UP, we have to patch these instructions away.
+ */
+#ifdef CONFIG_THUMB2_KERNEL
+/*
+ * For Thumb-2, special care is needed to ensure that the conditional WFE
+ * instruction really does assemble to exactly 4 bytes (as required by
+ * the SMP_ON_UP fixup code).   By itself "wfene" might cause the
+ * assembler to insert a extra (16-bit) IT instruction, depending on the
+ * presence or absence of neighbouring conditional instructions.
+ *
+ * To avoid this unpredictableness, an approprite IT is inserted explicitly:
+ * the assembler won't change IT instructions which are explicitly present
+ * in the input.
+ */
+#define WFE(cond)	__ALT_SMP_ASM(		\
+	"it " cond "\n\t"			\
+	"wfe" cond ".n",			\
+						\
+	"nop.w"					\
+)
+#else
+#define WFE(cond)	__ALT_SMP_ASM("wfe" cond, "nop")
+#endif
+
+#define SEV		__ALT_SMP_ASM(WASM(sev), WASM(nop))
 
 static inline void dsb_sev(void)
 {
