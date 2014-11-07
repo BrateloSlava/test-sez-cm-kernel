@@ -188,7 +188,7 @@ sleep 3
 ### Reduce backlight brightness
 ## for revert to default - enter 0
 if [ -e /sys/module/msm_fb/parameters/backlight_dimmer ]; then
-	echo "7" > /sys/module/msm_fb/parameters/backlight_dimmer
+	echo "11" > /sys/module/msm_fb/parameters/backlight_dimmer
 fi;
 
 ## Some tweaks
