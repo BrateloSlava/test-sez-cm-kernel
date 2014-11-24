@@ -349,13 +349,13 @@ CHECK		= sparse
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
 
-CUSTOM_FLAG	= -fgcse-lm -fgcse-sm -fsched-spec-load -fgcse-after-reload \
+CUSTOM_FLAG	= -fgcse-las -fgcse-sm -fsched-spec-load -fgcse-after-reload \
 		  -fforce-addr -ffast-math -fsingle-precision-constant \
 		  -mcpu=cortex-a15 -mtune=cortex-a15 -mfpu=neon-vfpv4 -ftree-vectorize \
 		  -mvectorize-with-neon-quad -marm -pipe \
 		  -fgraphite -floop-interchange -ftree-loop-distribution -floop-strip-mine -floop-block \
 		  -munaligned-access -fpredictive-commoning -fivopts \
-		  -fira-loop-pressure -std=gnu89
+		  -fira-loop-pressure -mneon-for-64bits -std=gnu89
 
 CFLAGS_MODULE   = -DMODULE -fno-pic $(CUSTOM_FLAG) -O2
 AFLAGS_MODULE   = -DMODULE $(CUSTOM_FLAG) -O2

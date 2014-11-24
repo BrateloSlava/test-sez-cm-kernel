@@ -58,13 +58,13 @@ comma = ,
 # macro, but instead defines a whole series of macros which makes
 # testing for a specific architecture or later rather impossible.
 
-CUSTOM_FLAG	= -fgcse-lm -fgcse-sm -fsched-spec-load -fgcse-after-reload \
+CUSTOM_FLAG	= -fgcse-las -fgcse-sm -fsched-spec-load -fgcse-after-reload \
 		  -fforce-addr -ffast-math -fsingle-precision-constant \
-		  -mcpu=cortex-a15 -mtune=cortex-a15 -mfpu=neon-vfpv4 -ftree-vectorize  \
+		  -mcpu=cortex-a15 -mtune=cortex-a15 -mfpu=neon-vfpv4 -ftree-vectorize \
 		  -mvectorize-with-neon-quad -marm -pipe \
 		  -fgraphite -floop-interchange -ftree-loop-distribution -floop-strip-mine -floop-block \
 		  -munaligned-access -fpredictive-commoning -fivopts \
-		  -fira-loop-pressure -std=gnu89
+		  -fira-loop-pressure -mneon-for-64bits -std=gnu89
 
 ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
 CUSTOM_FLAG	+= -Os
