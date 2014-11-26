@@ -30,7 +30,7 @@
  */ 
 void _wordcopy_fwd_aligned (long int dstp, long int srcp, size_t len) 
 { 
-    op_t a0, a1; 
+    op_t uninitialized_var(a0), uninitialized_var(a1); 
  
     switch (len % 8) { 
     case 2: 
@@ -133,8 +133,8 @@ do0:
  
 void _wordcopy_fwd_dest_aligned (long int dstp, long int srcp, size_t len) 
 { 
-    op_t a0, a1, a2, a3; 
-    int sh_1, sh_2; 
+    op_t uninitialized_var(a0), uninitialized_var(a1), uninitialized_var(a2), uninitialized_var(a3); 
+    int sh_1 = 0, sh_2 = 0; 
  
     /* 
      * Calculate how to shift a word read at the memory operation aligned 
@@ -219,7 +219,7 @@ do0:
  */ 
 void _wordcopy_bwd_aligned (long int dstp, long int srcp, size_t len) 
 { 
-    op_t a0, a1; 
+    op_t uninitialized_var(a0), uninitialized_var(a1); 
  
     switch (len % 8) { 
     case 2: 
@@ -322,8 +322,8 @@ do0:
  */ 
 void _wordcopy_bwd_dest_aligned (long int dstp, long int srcp, size_t len) 
 { 
-    op_t a0, a1, a2, a3; 
-    int sh_1, sh_2; 
+    op_t uninitialized_var(a0), uninitialized_var(a1), uninitialized_var(a2), uninitialized_var(a3); 
+    int sh_1 = 0, sh_2 = 0; 
  
     /* 
      * Calculate how to shift a word read at the memory operation aligned 
@@ -400,4 +400,3 @@ do1:
 do0: 
     ((op_t *) dstp)[3] = MERGE (a0, sh_1, a1, sh_2); 
 } 
- 
