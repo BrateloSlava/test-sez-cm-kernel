@@ -26,6 +26,10 @@
 #include "mipi_dsi.h"
 #include "mipi_dsi_panel_driver.h"
 
+#ifdef CONFIG_POWERSUSPEND
+#include <linux/powersuspend.h>
+#endif
+
 #ifdef CONFIG_FB_MSM_MDP303
 #define DSI_VIDEO_BASE	0xF0000 /* Taken from mdp_dma_dsi_video.c */
 #else
