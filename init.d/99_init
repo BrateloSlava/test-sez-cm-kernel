@@ -50,24 +50,7 @@ fi;
 
 ### Multi-Core Power Saving
 if [ -e /sys/devices/system/cpu/sched_mc_power_savings ]; then
-	echo "0" > /sys/devices/system/cpu/sched_mc_power_savings
-fi;
-
-### Logger mode
-## 0 - Enabled     
-## 1 - Auto Suspend
-## 2 - Disabled    
-
-if [ -e /sys/module/logger/parameters/log_mode ]; then
-	echo "2" > /sys/module/logger/parameters/log_mode
-fi;
-
-### Printk logging control
-## 0 - Disable
-## 1 - Enable
-
-if [ -e /sys/kernel/printk_mode/ ]; then
-	echo "0" > /sys/kernel/printk_mode/printk_mode
+	echo "2" > /sys/devices/system/cpu/sched_mc_power_savings
 fi;
 
 # vibration level (default 32)
@@ -96,7 +79,10 @@ done
 sleep 3
 
 ### Change the TCP Congestion Algorithm
-sysctl -w net.ipv4.tcp_congestion_control=westwood
+#sysctl -w net.ipv4.tcp_congestion_control=westwood
+#sysctl -w net.ipv4.tcp_congestion_control=highspeed
+#sysctl -w net.ipv4.tcp_congestion_control=vegas
+sysctl -w net.ipv4.tcp_congestion_control=yeah
 
 ## Intelli plug setting
 if [ -e /sys/module/intelli_plug/ ]; then
@@ -189,6 +175,23 @@ sleep 3
 ## for revert to default - enter 0
 if [ -e /sys/module/msm_fb/parameters/backlight_dimmer ]; then
 	echo "11" > /sys/module/msm_fb/parameters/backlight_dimmer
+fi;
+
+### Logger mode
+## 0 - Enabled     
+## 1 - Auto Suspend
+## 2 - Disabled    
+
+if [ -e /sys/module/logger/parameters/log_mode ]; then
+	echo "2" > /sys/module/logger/parameters/log_mode
+fi;
+
+### Printk logging control
+## 0 - Disable
+## 1 - Enable
+
+if [ -e /sys/kernel/printk_mode/ ]; then
+	echo "0" > /sys/kernel/printk_mode/printk_mode
 fi;
 
 ## Some tweaks
