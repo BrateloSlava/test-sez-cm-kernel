@@ -357,6 +357,8 @@ CUSTOM_FLAG	= -fgcse-las -fgcse-sm -fsched-spec-load -fgcse-after-reload \
 		  -munaligned-access -fpredictive-commoning -fivopts \
 		  -fira-loop-pressure -mneon-for-64bits -std=gnu89
 
+CUSTOM_FLAG	+= -DNDEBUG
+
 CFLAGS_MODULE   = -DMODULE -fno-pic $(CUSTOM_FLAG) -O2
 AFLAGS_MODULE   = -DMODULE $(CUSTOM_FLAG) -O2
 LDFLAGS_MODULE  = 

@@ -66,6 +66,8 @@ CUSTOM_FLAG	= -fgcse-las -fgcse-sm -fsched-spec-load -fgcse-after-reload \
 		  -munaligned-access -fpredictive-commoning -fivopts \
 		  -fira-loop-pressure -mneon-for-64bits -std=gnu89
 
+CUSTOM_FLAG	+= -DNDEBUG
+
 ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
 CUSTOM_FLAG	+= -Os
 endif
