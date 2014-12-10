@@ -2928,7 +2928,6 @@ void tcp_send_ack(struct sock *sk)
 	TCP_SKB_CB(buff)->when = tcp_time_stamp;
 	tcp_transmit_skb(sk, buff, 0, GFP_ATOMIC);
 }
-EXPORT_SYMBOL_GPL(tcp_send_ack);
 
 /* This routine sends a packet with an out of date sequence
  * number. It assumes the other end will try to ack it.
